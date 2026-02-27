@@ -117,46 +117,63 @@ function randomPos() {
   const cx = W / 2;
   const cy = H / 2;
   const cw = 760;
-  const ch = 420;
-  const pad = 20;
+  const ch = 500;
+  const pad = 40;
+  const postitW = 190;
+  const postitH = 140;
 
-  const zones = [
-    () => ({
-      x: Math.random() * (W - 200),
-      y: Math.random() * Math.max(10, cy - ch / 2 - pad - 120),
-    }),
-    () => ({
-      x: Math.random() * (W - 200),
+  // Define 4 zones around the card
+  const zones = [];
+
+  // Top zone
+  if (cy - ch / 2 - pad > postitH + 20) {
+    zones.push(() => ({
+      x: Math.random() * (W - postitW - 20) + 10,
+      y: Math.random() * (cy - ch / 2 - pad - postitH) + 10,
+    }));
+  }
+
+  // Bottom zone
+  if (H - (cy + ch / 2 + pad) > postitH + 20) {
+    zones.push(() => ({
+      x: Math.random() * (W - postitW - 20) + 10,
       y:
         cy +
         ch / 2 +
         pad +
-        Math.random() * Math.max(10, H - cy - ch / 2 - pad - 120),
-    }),
-    () => ({
-      x: Math.random() * Math.max(10, cx - cw / 2 - pad - 180),
-      y: Math.random() * (H - 120),
-    }),
-    () => ({
+        Math.random() * (H - cy - ch / 2 - pad - postitH - 20),
+    }));
+  }
+
+  // Left zone
+  if (cx - cw / 2 - pad > postitW + 20) {
+    zones.push(() => ({
+      x: Math.random() * (cx - cw / 2 - pad - postitW - 20) + 10,
+      y: Math.random() * (H - postitH - 20) + 10,
+    }));
+  }
+
+  // Right zone
+  if (W - (cx + cw / 2 + pad) > postitW + 20) {
+    zones.push(() => ({
       x:
         cx +
         cw / 2 +
         pad +
-        Math.random() * Math.max(10, W - cx - cw / 2 - pad - 180),
-      y: Math.random() * (H - 120),
-    }),
-  ];
+        Math.random() * (W - cx - cw / 2 - pad - postitW - 20),
+      y: Math.random() * (H - postitH - 20) + 10,
+    }));
+  }
 
-  const valid = zones.filter((_, i) => {
-    if (i === 0) return cy - ch / 2 - pad > 130;
-    if (i === 1) return H - (cy + ch / 2 + pad) > 130;
-    if (i === 2) return cx - cw / 2 - pad > 190;
-    if (i === 3) return W - (cx + cw / 2 + pad) > 190;
-  });
+  // If no valid zones, place anywhere on screen
+  if (zones.length === 0) {
+    return {
+      x: Math.random() * (W - postitW - 20) + 10,
+      y: Math.random() * (H - postitH - 20) + 10,
+    };
+  }
 
-  const fn = valid.length
-    ? valid[Math.floor(Math.random() * valid.length)]
-    : zones[0];
+  const fn = zones[Math.floor(Math.random() * zones.length)];
   return fn();
 }
 
@@ -208,17 +225,17 @@ submitBtn.addEventListener("click", () => {
   const combinedGlyph = currentResults.map((r) => r.glyph).join(" ");
   const labels = currentResults.map((r) => r.label);
 
-  // Use the most extreme emotion label
+  // Use the most extreme emotion label (prioritize negative emotions)
   const emotionPriority = [
-    "rage",
-    "anger",
-    "disappointment",
-    "cynicism",
-    "ambivalence",
-    "contentment",
-    "joyful satisfaction",
-    "moved",
     "overwhelming ecstasy",
+    "moved",
+    "joyful satisfaction",
+    "contentment",
+    "ambivalence",
+    "cynicism",
+    "disappointment",
+    "anger",
+    "rage",
   ];
   const dominantLabel =
     emotionPriority.reverse().find((label) => labels.includes(label)) ||
