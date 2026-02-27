@@ -176,9 +176,88 @@ function addPostit(name, glyph, label) {
     <div class="postit-glyph">${glyph}</div>
     <div class="postit-emotion">${label}</div>
   `;
+  
+  // Make postit draggable
+  makeDraggable(el);
+  
   document.getElementById('archive').appendChild(el);
 
   archiveCount++;
+}
+
+// Draggable functionality
+function makeDraggable(element) {
+  let isDragging = false;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  element.addEventListener('mousedown', dragStart);
+  element.addEventListener('touchstart', dragStart, { passive: false });
+
+  function dragStart(e) {
+    isDragging = true;
+    element.style.cursor = 'grabbing';
+    element.style.zIndex = 1000;
+
+    const rect = element.getBoundingClientRect();
+    
+    if (e.type === 'touchstart') {
+      offsetX = e.touches[0].clientX - rect.left;
+      offsetY = e.touches[0].clientY - rect.top;
+    } else {
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+    }
+
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', dragEnd);
+    document.addEventListener('touchmove', drag, { passive: false });
+    document.addEventListener('touchend', dragEnd);
+
+    e.preventDefault();
+  }
+
+  function drag(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+
+    let clientX, clientY;
+    
+    if (e.type === 'touchmove') {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    let newX = clientX - offsetX;
+    let newY = clientY - offsetY;
+
+    // Boundary check
+    const rect = element.getBoundingClientRect();
+    const maxX = window.innerWidth - rect.width;
+    const maxY = window.innerHeight - rect.height;
+    
+    newX = Math.max(10, Math.min(maxX - 10, newX));
+    newY = Math.max(10, Math.min(maxY - 10, newY));
+
+    element.style.left = `${newX}px`;
+    element.style.top = `${newY}px`;
+  }
+
+  function dragEnd() {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    element.style.cursor = 'grab';
+    element.style.zIndex = 'auto';
+
+    document.removeEventListener('mousemove', drag);
+    document.removeEventListener('mouseup', dragEnd);
+    document.removeEventListener('touchmove', drag);
+    document.removeEventListener('touchend', dragEnd);
+  }
 }
 
 function updateSubmit() {
