@@ -1,24 +1,22 @@
 // ── TYPE ANIMATION ───────────────────────────────────────────────
 let timers = [];
 
-function clearTimers() {
-  timers.forEach(clearTimeout);
-  timers = [];
+function clearTimers() { 
+  timers.forEach(clearTimeout); 
+  timers = []; 
 }
 
 function typeInto(container, str) {
-  const cur = container.querySelector(".cursor");
+  const cur = container.querySelector('.cursor');
   [...str].forEach((ch, i) => {
     const t = setTimeout(() => {
-      const span = document.createElement("span");
-      span.className = "char";
+      const span = document.createElement('span');
+      span.className = 'char'; 
       span.textContent = ch;
       container.insertBefore(span, cur);
-      requestAnimationFrame(() =>
-        requestAnimationFrame(() => span.classList.add("on")),
-      );
+      requestAnimationFrame(() => requestAnimationFrame(() => span.classList.add('on')));
       if (i === str.length - 1) {
-        const t2 = setTimeout(() => cur.classList.add("done"), 200);
+        const t2 = setTimeout(() => cur.classList.add('done'), 200);
         timers.push(t2);
       }
     }, i * 50);
@@ -32,58 +30,46 @@ let currentResults = [];
 
 function render(text) {
   clearTimers();
-  const panel = document.getElementById("outputPanel");
-  panel.innerHTML = "";
+  const panel = document.getElementById('outputPanel');
+  panel.innerHTML = '';
   currentResults = [];
 
   if (!text.trim()) {
-    panel.innerHTML = "";
-    updateSubmit();
+    panel.innerHTML = '';
+    updateSubmit(); 
     return;
   }
 
   // Split into sentences
   const sentences = splitSentences(text);
-
+  
   // Filter sentences that have keywords and score them
   sentences.forEach((sentence, idx) => {
     const lower = sentence.toLowerCase();
-
+    
     // Score all 5 axes
-    const axes = ["expect", "price", "service", "hunger", "value"].map((ax) =>
-      scoreAxis(lower, ax),
-    );
+    const axes = ['expect','price','service','hunger','value'].map(ax => scoreAxis(lower, ax));
     const [eR, pR, sR, hR, vR] = axes;
-
+    
     // Merge value into expectation
     const eScore = Math.max(-2, Math.min(2, eR.score + vR.score));
     const total = eScore + pR.score + sR.score + hR.score;
-
+    
     // Skip if no keywords detected
-    if (
-      total === 0 &&
-      eR.matched.length === 0 &&
-      pR.matched.length === 0 &&
-      sR.matched.length === 0 &&
-      hR.matched.length === 0 &&
-      vR.matched.length === 0
-    ) {
+    if (total === 0 && eR.matched.length === 0 && pR.matched.length === 0 &&
+        sR.matched.length === 0 && hR.matched.length === 0 && vR.matched.length === 0) {
       return;
     }
-
+    
     const glyph = buildGlyph(eScore, pR.score, sR.score, hR.score);
     const label = emotionLabel(eScore, pR.score, sR.score, hR.score);
-    const pips = [eScore, pR.score, sR.score, hR.score]
-      .map(
-        (v) =>
-          `<div class="pip ${v >= 1 ? "pip-h" : v === 0 ? "pip-m" : "pip-l"}"></div>`,
-      )
-      .join("");
-
+    const pips = [eScore, pR.score, sR.score, hR.score].map(v =>
+      `<div class="pip ${v >= 1 ? 'pip-h' : v === 0 ? 'pip-m' : 'pip-l'}"></div>`).join('');
+    
     currentResults.push({ glyph, label, sentence: sentence.trim() });
-
-    const block = document.createElement("div");
-    block.className = "out-block";
+    
+    const block = document.createElement('div');
+    block.className = 'out-block';
     block.innerHTML = `
       <div class="out-glyph" id="og-${idx}"><span class="cursor"></span></div>
       <div class="out-meta">
@@ -93,18 +79,18 @@ function render(text) {
       <div class="out-src">${sentence}</div>
     `;
     panel.appendChild(block);
-
+    
     const gt = document.getElementById(`og-${idx}`);
     const delay = idx * 100; // stagger animation
     const t = setTimeout(() => typeInto(gt, glyph), delay);
     timers.push(t);
   });
-
+  
   // Show message if no sentences had keywords
   if (currentResults.length === 0) {
     panel.innerHTML = '<span class="out-empty">no keyword detected</span>';
   }
-
+  
   updateSubmit();
 }
 
@@ -124,44 +110,36 @@ function randomPos() {
 
   // Define 4 zones around the card
   const zones = [];
-
+  
   // Top zone
   if (cy - ch / 2 - pad > postitH + 20) {
     zones.push(() => ({
       x: Math.random() * (W - postitW - 20) + 10,
-      y: Math.random() * (cy - ch / 2 - pad - postitH) + 10,
+      y: Math.random() * (cy - ch / 2 - pad - postitH) + 10
     }));
   }
-
+  
   // Bottom zone
   if (H - (cy + ch / 2 + pad) > postitH + 20) {
     zones.push(() => ({
       x: Math.random() * (W - postitW - 20) + 10,
-      y:
-        cy +
-        ch / 2 +
-        pad +
-        Math.random() * (H - cy - ch / 2 - pad - postitH - 20),
+      y: cy + ch / 2 + pad + Math.random() * (H - cy - ch / 2 - pad - postitH - 20)
     }));
   }
-
+  
   // Left zone
   if (cx - cw / 2 - pad > postitW + 20) {
     zones.push(() => ({
       x: Math.random() * (cx - cw / 2 - pad - postitW - 20) + 10,
-      y: Math.random() * (H - postitH - 20) + 10,
+      y: Math.random() * (H - postitH - 20) + 10
     }));
   }
-
+  
   // Right zone
   if (W - (cx + cw / 2 + pad) > postitW + 20) {
     zones.push(() => ({
-      x:
-        cx +
-        cw / 2 +
-        pad +
-        Math.random() * (W - cx - cw / 2 - pad - postitW - 20),
-      y: Math.random() * (H - postitH - 20) + 10,
+      x: cx + cw / 2 + pad + Math.random() * (W - cx - cw / 2 - pad - postitW - 20),
+      y: Math.random() * (H - postitH - 20) + 10
     }));
   }
 
@@ -169,7 +147,7 @@ function randomPos() {
   if (zones.length === 0) {
     return {
       x: Math.random() * (W - postitW - 20) + 10,
-      y: Math.random() * (H - postitH - 20) + 10,
+      y: Math.random() * (H - postitH - 20) + 10
     };
   }
 
@@ -180,70 +158,69 @@ function randomPos() {
 function addPostit(name, glyph, label) {
   const pos = randomPos();
   const rot = (Math.random() - 0.5) * 10;
+  const postitW = 190;
+  const postitH = 140;
 
-  const el = document.createElement("div");
-  el.className = "postit";
-  el.style.left = `${Math.max(8, Math.min(window.innerWidth - 198, pos.x))}px`;
-  el.style.top = `${Math.max(8, Math.min(window.innerHeight - 140, pos.y))}px`;
-  el.style.setProperty("--rot", `${rot}deg`);
+  const el = document.createElement('div');
+  el.className = 'postit';
+  
+  // Ensure postit stays within viewport bounds
+  const safeX = Math.max(10, Math.min(window.innerWidth - postitW - 10, pos.x));
+  const safeY = Math.max(10, Math.min(window.innerHeight - postitH - 10, pos.y));
+  
+  el.style.left = `${safeX}px`;
+  el.style.top = `${safeY}px`;
+  el.style.setProperty('--rot', `${rot}deg`);
   el.innerHTML = `
-    <div class="postit-name">${name || "anonymous"}</div>
+    <div class="postit-name">${name || 'anonymous'}</div>
     <div class="postit-glyph">${glyph}</div>
     <div class="postit-emotion">${label}</div>
   `;
-  document.getElementById("archive").appendChild(el);
+  document.getElementById('archive').appendChild(el);
 
   archiveCount++;
 }
 
 function updateSubmit() {
-  document.getElementById("submitBtn").disabled = currentResults.length === 0;
+  document.getElementById('submitBtn').disabled = currentResults.length === 0;
 }
 
 // ── EVENTS ───────────────────────────────────────────────────────
-const reviewInput = document.getElementById("reviewInput");
-const nameInput = document.getElementById("nameInput");
-const clearBtn = document.getElementById("clearBtn");
-const submitBtn = document.getElementById("submitBtn");
+const reviewInput = document.getElementById('reviewInput');
+const nameInput = document.getElementById('nameInput');
+const clearBtn = document.getElementById('clearBtn');
+const submitBtn = document.getElementById('submitBtn');
 
 let debounce = null;
-reviewInput.addEventListener("input", () => {
+reviewInput.addEventListener('input', () => {
   clearTimeout(debounce);
   debounce = setTimeout(() => render(reviewInput.value), 450);
 });
 
-clearBtn.addEventListener("click", () => {
-  reviewInput.value = "";
-  render("");
+clearBtn.addEventListener('click', () => {
+  reviewInput.value = '';
+  render('');
 });
 
-submitBtn.addEventListener("click", () => {
+submitBtn.addEventListener('click', () => {
   if (!currentResults.length) return;
-  const name = nameInput.value.trim() || "anonymous";
-
+  const name = nameInput.value.trim() || 'anonymous';
+  
   // Combine all glyphs into one postit
-  const combinedGlyph = currentResults.map((r) => r.glyph).join(" ");
-  const labels = currentResults.map((r) => r.label);
-
+  const combinedGlyph = currentResults.map(r => r.glyph).join(' ');
+  const labels = currentResults.map(r => r.label);
+  
   // Use the most extreme emotion label (prioritize negative emotions)
   const emotionPriority = [
-    "overwhelming ecstasy",
-    "moved",
-    "joyful satisfaction",
-    "contentment",
-    "ambivalence",
-    "cynicism",
-    "disappointment",
-    "anger",
-    "rage",
+    'overwhelming ecstasy', 'moved', 'joyful satisfaction',
+    'contentment', 'ambivalence', 'cynicism', 
+    'disappointment', 'anger', 'rage'
   ];
-  const dominantLabel =
-    emotionPriority.reverse().find((label) => labels.includes(label)) ||
-    labels[0];
-
+  const dominantLabel = emotionPriority.reverse().find(label => labels.includes(label)) || labels[0];
+  
   addPostit(name, combinedGlyph, dominantLabel);
-
-  reviewInput.value = "";
-  nameInput.value = "";
-  render("");
+  
+  reviewInput.value = '';
+  nameInput.value = '';
+  render('');
 });
