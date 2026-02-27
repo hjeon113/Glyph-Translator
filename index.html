@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>COTE Glyph Translator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- ARCHIVE LAYER -->
+    <div id="archive"></div>
+
+    <!-- TRANSLATOR CARD -->
+    <div class="translator-wrap">
+      <div class="translator-card">
+        <!-- NAME ROW -->
+        <div class="t-namebar">
+          <span class="t-namelabel">Your name</span>
+          <input
+            type="text"
+            class="t-nameinput"
+            id="nameInput"
+            placeholder="Enter your name"
+          />
+        </div>
+
+        <!-- LANGUAGE SELECTOR -->
+        <div class="t-langbar">
+          <div class="t-lang">Review</div>
+          <div class="t-lang">Glyph</div>
+          <div class="t-swap">⇄</div>
+        </div>
+
+        <!-- PANELS -->
+        <div class="t-panels">
+          <!-- INPUT PANEL -->
+          <div class="t-panel-left">
+            <textarea
+              class="t-textarea"
+              id="reviewInput"
+              placeholder="Type or paste your review here..."
+            ></textarea>
+          </div>
+
+          <!-- OUTPUT PANEL -->
+          <div class="t-panel-right">
+            <div class="t-output-box" id="outputPanel">
+              <!-- Glyphs will appear here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM BAR -->
+        <div class="t-bottombar">
+          <button class="t-btn t-btn-clear" id="clearBtn">CLEAR</button>
+          <button class="t-btn t-btn-archive" id="submitBtn" disabled>
+            ARCHIVE
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="keywords.js"></script>
+    <script src="glyph.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
